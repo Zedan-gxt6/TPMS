@@ -25,10 +25,10 @@ app.use((req, res, next) => {
 
 
 const pool = new Pool({
-  user: "postgres",
+  user: "Your_username",
   host: "localhost",
   database: "TPMS",
-  password: "Zedan@12345",
+  password: "Your_password",
   port: 5432, 
 });
 
