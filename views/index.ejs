@@ -1,0 +1,19 @@
+<%- include("partials/header") %>
+<h1>TPMS Dashboard</h1>
+
+<div class="dashboard-grid">
+  <a href="/users">👥 Users</a>
+  <a href="/species">🌿 Species</a>
+  <a href="/zones">🗺️ Zones</a>
+  <a href="/saplings">🌱 Saplings</a>
+  <a href="/maintenance">🛠️ Maintenance</a>
+  
+  <% if (user && user.role === 'admin') { %>
+    <a href="/reports" style="border-top: 4px solid gold;">📊 Reports</a>
+    <a href="/requests" style="border-top: 4px solid red;">📝 Manage Requests</a>
+  <% } else { %>
+    <a href="/notifications" style="border-top: 4px solid blue;">🔔 Notifications</a>
+  <% } %>
+</div>
+<%- include("partials/footer") %>
+<img src="planting-small-tree-stockcake.webp" alt="tree-imu" width="1600px">

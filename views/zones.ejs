@@ -1,0 +1,26 @@
+<%- include("partials/header") %>
+
+<h3><%= user && user.role === 'admin' ? 'Add Zone' : 'Request Zone' %></h3>
+<form action="<%= user && user.role === 'admin' ? '/zones' : '/zones/request' %>" method="POST">
+  <input type="number" name="area" placeholder="Area" required />
+  <button><%= user && user.role === 'admin' ? 'Add Zone' : 'Submit Request' %></button>
+</form>
+
+<h3>All Zones</h3>
+<ul>
+  <% zones.forEach(z => { %>
+    <li>
+      <% if (user && user.role === 'admin') { %>
+        <form action="/zones/update/<%= z.zone_id %>" method="POST" style="display:inline;">
+          ID: <%= z.zone_id %> |
+          <input type="number" name="area" value="<%= z.area %>" required />
+          <button>Update</button>
+        </form>
+      <% } else { %>
+        ID: <%= z.zone_id %> | Area: <%= z.area %>
+      <% } %>
+    </li>
+  <% }) %>
+</ul>
+<a href="/home">Back</a>
+<%- include("partials/footer") %>

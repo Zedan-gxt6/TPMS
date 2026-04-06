@@ -1,0 +1,49 @@
+<%- include("partials/header") %>
+<h1>Maintenance</h1>
+
+<h3><%= user && user.role === 'admin' ? 'Add Maintenance' : 'Request Maintenance' %></h3>
+<form action="<%= user && user.role === 'admin' ? '/maintenance' : '/maintenance/request' %>" method="POST">
+
+  Sapling:
+  <select name="sapling_id">
+    <% saplings.forEach(s => { %>
+      <option value="<%= s.sapling_id %>"><%= s.sapling_id %></option>
+    <% }) %>
+  </select>
+
+  <% if (user && user.role === 'admin') { %>
+    User:
+    <select name="user_id">
+      <% users.forEach(u => { %>
+        <option value="<%= u.user_id %>"><%= u.name %></option>
+      <% }) %>
+    </select>
+  <% } else { %>
+    User:
+    <input type="hidden" name="user_id" value="<%= user.id %>" />
+    <input type="text" value="<%= user.name %>" readonly />
+  <% } %>
+
+  Date:
+  <input type="date" name="date" required />
+
+  Activity:
+  <input type="text" name="activity" placeholder="eg. Watering" />
+
+  Remarks:
+  <input type="text" name="remarks" />
+
+  <button type="submit"><%= user && user.role === 'admin' ? 'Add' : 'Submit Request' %></button>
+</form>
+
+<h3>Logs</h3>
+<ul>
+  <% logs.forEach(m => { %>
+    <li>
+      Sapling: <%= m.sapling_id %> | By: <%= m.done_by %> | Activity: <%= m.activity %> | Date: <%= m.date %>
+    </li>
+  <% }) %>
+</ul>
+
+<a href="/home">Back</a>
+<%- include("partials/footer") %>

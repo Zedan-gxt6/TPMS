@@ -1,0 +1,18 @@
+<%- include("partials/header") %>
+<h1>My Notifications</h1>
+
+<ul>
+  <% notifications.forEach(n => { %>
+    <li>
+      <strong><%= new Date(n.created_at).toLocaleString() %>:</strong> <%= n.message %>
+    </li>
+  <% }) %>
+  <% if(notifications.length === 0) { %> <li>You have no notifications.</li> <% } %>
+</ul>
+
+<form action="/notifications/clear" method="POST">
+  <button type="submit">Clear Notifications</button>
+</form>
+
+<a href="/home">Back to Dashboard</a>
+<%- include("partials/footer") %>

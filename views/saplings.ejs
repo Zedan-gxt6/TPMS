@@ -1,0 +1,89 @@
+<%- include("partials/header") %>
+<h1>Saplings</h1>
+
+<h3>Add Sapling</h3>
+<form action="/saplings" method="POST">
+
+  Species:
+  <select name="species_id">
+    <% species.forEach(s => { %>
+      <option value="<%= s.species_id %>"><%= s.name %></option>
+    <% }) %>
+  </select>
+
+  Zone:
+  <select name="zone_id">
+    <% zones.forEach(z => { %>
+      <option value="<%= z.zone_id %>"><%= z.zone_id %></option>
+    <% }) %>
+  </select>
+
+  <% if (user.role === 'admin') { %>
+    User:
+    <select name="user_id">
+      <% users.forEach(u => { %>
+        <option value="<%= u.user_id %>"><%= u.name %></option>
+      <% }) %>
+    </select>
+  <% } %>
+
+  Date:
+  <input type="date" name="plant_date" required />
+
+  Status:
+  <select name="status">
+    <option>Alive</option>
+    <option>Dead</option>
+    <option>Diseased</option>
+  </select>
+
+  Height:
+  <input type="number" step="0.1" name="height" />
+
+  <button type="submit">Add</button>
+</form>
+
+<!-- ✅ Toggle buttons -->
+<% if (user.role === 'user') { %>
+  <a href="/saplings?view=all">All Saplings</a>
+  <a href="/saplings?view=my">  My Saplings</a>
+<% } %>
+
+<h3>Saplings List</h3>
+<ul>
+  <% saplings.forEach(s => { %>
+    <li>
+      ID: <%= s.sapling_id %> |
+      Species: <%= s.species %> |
+      Zone: <%= s.zone_id %> |
+      By: <%= s.planted_by %> |
+      Status:
+
+      <% if (
+        user.role === 'admin' || 
+        (user.role === 'user' && view !== 'all' && user.id === s.user_id)
+      ) { %>
+
+        <!-- ✅ Editable -->
+        <form action="/saplings/update/<%= s.sapling_id %>" method="POST" style="display:inline;">
+          <select name="status">
+            <option value="Alive" <%= s.status === 'Alive' ? 'selected' : '' %>>Alive</option>
+            <option value="Dead" <%= s.status === 'Dead' ? 'selected' : '' %>>Dead</option>
+            <option value="Diseased" <%= s.status === 'Diseased' ? 'selected' : '' %>>Diseased</option>
+          </select>
+          <button type="submit">Update</button>
+        </form>
+
+      <% } else { %>
+
+        <!-- ❌ Read-only -->
+        <%= s.status %>
+
+      <% } %>
+
+    </li>
+  <% }) %>
+</ul>
+
+<a href="/home">Back</a>
+<%- include("partials/footer") %>

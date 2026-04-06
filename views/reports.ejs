@@ -1,0 +1,29 @@
+<%- include("partials/header") %>
+<h1>Reports</h1>
+
+<h3>Zone-wise Count</h3>
+<ul>
+  <% zoneReport.forEach(r => { %>
+    <li>
+      Zone: <%= r.zone_id %> |
+      Total: <%= r.total_saplings %>
+    </li>
+  <% }) %>
+</ul>
+
+<h3>Survival Rate</h3>
+<ul>
+  <% survivalReport.forEach(r => { %>
+    <li>
+      Zone: <%= r.zone_id %> |
+      Alive: <%= r.alive %> |
+      Dead: <%= r.dead %> |
+      Diseased: <%= r.diseased %> |
+      Total: <%= r.total %> |
+      Survival Rate: <%= r.survival_rate %> %
+    </li>
+  <% }) %>
+</ul>
+
+<a href="/home">Back</a>
+<%- include("partials/footer") %>

@@ -1,0 +1,33 @@
+<%- include("partials/header") %>
+
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <h1>Welcome Back</h1>
+    <p>Manage your forest, one sapling at a time.</p>
+
+    <form action="/" method="POST" style="box-shadow:none; border:none; padding:0;">
+      <input type="email" name="email" placeholder="Email Address" required />
+      
+      <input type="password" name="password" placeholder="Password" required />
+
+      <select name="role" class="role-selector" required>
+        <option value="" disabled selected>Select Your Role</option>
+        <option value="admin">🌲 Administrator</option>
+        <option value="user">🍃 Field User</option>
+      </select>
+
+      <button type="submit">Sign In</button>
+    </form>
+
+    <% if (error) { %>
+      <p class="error" style="margin-top: 15px;"><%= error %></p>
+    <% } %>
+
+    <div class="auth-footer-links">
+      <span>New to TPMS?</span> 
+      <a href="/signup">Create an Account</a>
+    </div>
+  </div>
+</div>
+
+<%- include("partials/footer") %>

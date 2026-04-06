@@ -1,0 +1,24 @@
+<%- include("partials/header") %>
+<h1>Species</h1>
+
+<h3><%= user && user.role === 'admin' ? 'Add Species' : 'Request Species' %></h3>
+<form action="<%= user && user.role === 'admin' ? '/species' : '/species/request' %>" method="POST">
+  <input name="name" placeholder="Name" required />
+  <input name="scientific_name" placeholder="Scientific Name" />
+  <input name="growth_type" placeholder="Growth Type" />
+  <input type="number" name="average_lifespan" placeholder="Lifespan" />
+
+  <button><%= user && user.role === 'admin' ? 'Add Species' : 'Submit Request' %></button>
+</form>
+
+<h3>All Species</h3>
+<ul>
+  <% species.forEach(s => { %>
+    <li>
+      ID: <%= s.species_id %> | Name: <%= s.name %> | Type: <%= s.growth_type %>
+    </li>
+  <% }) %>
+</ul>
+
+<a href="/home">Back</a>
+<%- include("partials/footer") %>

@@ -1,0 +1,41 @@
+<%- include("partials/header") %>
+<h1>Manage Requests</h1>
+
+<h3>Zone Requests</h3>
+<ul>
+  <% zoneReqs.forEach(r => { %>
+    <li>
+      User ID: <%= r.user_id %>(<%=r.name%>) requests Zone Area: <%= r.area %>
+      <form action="/requests/zones/<%= r.request_id %>/accept" method="POST" style="display:inline;"><button>Accept</button></form>
+      <form action="/requests/zones/<%= r.request_id %>/decline" method="POST" style="display:inline;"><button>Decline</button></form>
+    </li>
+  <% }) %>
+  <% if(zoneReqs.length === 0) { %> <li>No pending zone requests.</li> <% } %>
+</ul>
+
+<h3>Species Requests</h3>
+<ul>
+  <% speciesReqs.forEach(r => { %>
+    <li>
+      User ID: <%= r.user_id %> (<%= r.user_name %>) requests Species: <%= r.species_name %> (<%= r.scientific_name %>)
+      <form action="/requests/species/<%= r.request_id %>/accept" method="POST" style="display:inline;"><button>Accept</button></form>
+      <form action="/requests/species/<%= r.request_id %>/decline" method="POST" style="display:inline;"><button>Decline</button></form>
+    </li>
+  <% }) %>
+  <% if(speciesReqs.length === 0) { %> <li>No pending species requests.</li> <% } %>
+</ul>
+
+<h3>Maintenance Requests</h3>
+<ul>
+  <% maintReqs.forEach(r => { %>
+    <li>
+      User ID: <%= r.user_id %> requests Maintenance on Sapling: <%= r.sapling_id %> (<%= r.activity %>)
+      <form action="/requests/maintenance/<%= r.request_id %>/accept" method="POST" style="display:inline;"><button>Accept</button></form>
+      <form action="/requests/maintenance/<%= r.request_id %>/decline" method="POST" style="display:inline;"><button>Decline</button></form>
+    </li>
+  <% }) %>
+  <% if(maintReqs.length === 0) { %> <li>No pending maintenance requests.</li> <% } %>
+</ul>
+
+<a href="/home">Back to Dashboard</a>
+<%- include("partials/footer") %>
