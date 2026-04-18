@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import pkg from "pg";
 import cors from "cors";
 import methodOverride from "method-override";
+import bcrypt from "bcrypt";
 
 const { Pool } = pkg;
 
@@ -25,15 +26,15 @@ app.use((req, res, next) => {
 
 
 const pool = new Pool({
-  user: "Your_username",
+  user: "postgres",
   host: "localhost",
   database: "TPMS",
-  password: "Your_password",
-  port: 5432, 
+  password: "Zedan@12345",
+  port: 5432,
 });
 
 app.get("/home", (req, res) => {
-  res.render("index.ejs",{user:currentUser});
+  res.render("index.ejs", { user: currentUser });
 });
 
 app.get("/", (req, res) => {
@@ -55,7 +56,8 @@ app.post("/", async (req, res) => {
 
     const user = result.rows[0];
 
-    if (user.password !== password) {
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       return res.render("login.ejs", { error: "Incorrect password" });
     }
 
@@ -83,7 +85,7 @@ app.get("/signup", (req, res) => {
 
 app.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
-  const defaultRole = "user"; 
+  const defaultRole = "user";
   try {
     // check if user exists
     const check = await pool.query(
@@ -94,10 +96,14 @@ app.post("/signup", async (req, res) => {
     if (check.rows.length > 0) {
       return res.render("signup.ejs", { error: "User already exists" });
     }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     await pool.query(
       `INSERT INTO users (name, email, password, role)
        VALUES ($1, $2, $3, $4)`,
-      [name, email, password, defaultRole] 
+      [name, email, hashedPassword, defaultRole]
     );
     res.redirect("/");
   } catch (err) {
@@ -129,7 +135,7 @@ app.post("/zones", async (req, res) => {
       [area]
     );
 
-   res.redirect("/zones");
+    res.redirect("/zones");
   } catch (err) {
     console.error(err);
     res.status(500).send("Error creating zone");
@@ -249,7 +255,7 @@ app.post("/saplings/update/:id", async (req, res) => {
       [status, id]
     );
 
-    res.redirect("/saplings"); 
+    res.redirect("/saplings");
   } catch (err) {
     console.error(err);
     res.status(500).send("Error updating sapling");
@@ -270,7 +276,7 @@ app.get("/reports", async (req, res) => {
     `);
 
     // survival rate
-  const survivalReport = await pool.query(`
+    const survivalReport = await pool.query(`
     SELECT 
     z.zone_id,
     COUNT(s.sapling_id) AS total,
@@ -374,8 +380,8 @@ app.get("/maintenance", async (req, res) => {
     let logsResult;
 
     if (currentUser.role === "admin") {
-     // admin → all logs
-        logsResult = await pool.query(`
+      // admin → all logs
+      logsResult = await pool.query(`
         SELECT m.maintenance_id, s.sapling_id, u.name AS done_by,
            m.date, m.activity, m.remarks
         FROM maintenance m
@@ -384,8 +390,8 @@ app.get("/maintenance", async (req, res) => {
         ORDER BY m.date DESC
         ` );
     } else {
-    // user → only his logs
-    logsResult = await pool.query(`
+      // user → only his logs
+      logsResult = await pool.query(`
     SELECT m.maintenance_id, s.sapling_id, u.name AS done_by,
            m.date, m.activity, m.remarks
     FROM maintenance m
@@ -513,19 +519,19 @@ app.get("/requests", async (req, res) => {
       FROM zone_requests zr 
       JOIN users u ON zr.user_id = u.user_id
     `);
-    
+
     const speciesReqs = await pool.query(`
       SELECT sr.*, sr.name AS species_name, u.name AS user_name 
       FROM species_requests sr 
       JOIN users u ON sr.user_id = u.user_id
     `);
-    
+
     const maintReqs = await pool.query(`
       SELECT mr.*, u.name 
       FROM maintenance_requests mr 
       JOIN users u ON mr.user_id = u.user_id
     `);
-    
+
     res.render("requests.ejs", {
       zoneReqs: zoneReqs.rows,
       speciesReqs: speciesReqs.rows,
@@ -547,7 +553,7 @@ app.post("/requests/zones/:id/:action", async (req, res) => {
     } else {
       await pool.query("INSERT INTO notifications (user_id, message) VALUES ($1, $2)", [r.user_id, `Your request to add Zone Area ${r.area} was DECLINED.`]);
     }
-    
+
     await pool.query("DELETE FROM zone_requests WHERE request_id = $1", [id]);
     res.redirect("/requests");
   } catch (err) { console.error(err); res.send("Error processing request"); }
@@ -566,7 +572,7 @@ app.post("/requests/species/:id/:action", async (req, res) => {
     } else {
       await pool.query("INSERT INTO notifications (user_id, message) VALUES ($1, $2)", [r.user_id, `Your request to add Species '${r.name}' was DECLINED.`]);
     }
-    
+
     await pool.query("DELETE FROM species_requests WHERE request_id = $1", [id]);
     res.redirect("/requests");
   } catch (err) { console.error(err); res.send("Error processing request"); }
@@ -585,7 +591,7 @@ app.post("/requests/maintenance/:id/:action", async (req, res) => {
     } else {
       await pool.query("INSERT INTO notifications (user_id, message) VALUES ($1, $2)", [r.user_id, `Your maintenance request for Sapling ${r.sapling_id} was DECLINED.`]);
     }
-    
+
     await pool.query("DELETE FROM maintenance_requests WHERE request_id = $1", [id]);
     res.redirect("/requests");
   } catch (err) { console.error(err); res.send("Error processing request"); }
@@ -610,5 +616,5 @@ app.post("/notifications/clear", async (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
-}); 
+});
 
